@@ -1,3 +1,36 @@
+*** Python API for Reluplex, June 2018 ***
+
+Instructions
+------------
+
+Switch to python branch:
+
+	  git checkout python
+	  
+Compiling GLPK:
+
+	  cd glpk-4.60
+	  ./configure_glpk.sh
+	  make
+	  make install
+    Then add the ...glpk-4.60/installed/lib to your LD_LIBRARY_PATH variable. You can add it to ~/.bashrc so the folder is always on the path.
+
+Compiling Reluplex:
+
+	  cd reluplexpy
+	  make
+    Then add the root ReluplexCav2017 folder to your PYTHONPATH variable. You can add it to ~/.bashrc so the folder is always on the path.
+    
+    
+Running Experiments:
+
+	  cd VerticalCAS
+	  mkdir marResults
+	  mkdir marLogs
+	  python3 mar.py
+	  
+	  
+
 *** Reluplex, May 2017 ***
 
 This repository contains the proof-of-concept implementation of the
