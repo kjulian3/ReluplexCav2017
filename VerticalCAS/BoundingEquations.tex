@@ -1,0 +1,135 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage[capitalize]{cleveref}
+\usepackage[per-mode=symbol,detect-all]{siunitx}
+\usepackage{booktabs}
+
+\begin{document}
+	
+\title{Marabou input bounds for verifying the safety of a neural network representation of ACAS Xa}
+\author{Kyle Julian}
+\maketitle
+
+\section{Advisories}
+The variable $w=\pm1$ is used to specify whether the bound is an upper or lower bound. If the bound is a lower bound, $w=-1$ and $v \in (-\infty,v_\text{lo}]$, and if the bound is an upper bound, $w=1$ and $v \in [v_\text{lo},+\infty)$. Each advisory has an associated $w$ and $v_lo$.
+
+There are 11 advisories in Run 15 of the Acas Xa vertical logic:
+
+\begin{table}[h!]
+	\caption{ACAS Xa Advisories}
+	\centering
+	\begin{tabular}{lccc}
+		\toprule
+	Advisory & Description & $w$ & $v_\text{lo}$ (ft/min) \\
+		\midrule
+		COC & Clear of conflict & N/A & N/A  \\
+		DNC & Do not climb & -1 & 0 \\
+		DND & Do not descend & +1 & 0 \\
+		Maintain & Maintain vertical rate & N/A & N/A \\
+		DES1500 & Descend at least 1500 ft/min & -1 & -1500 \\
+		CL1500 & Climb at least 1500 ft/min & +1 & +1500 \\
+		SDES1500 & Strengthen descent to at least 1500 ft/min & -1 & -1500 \\
+		SCL1500 & Strengthen climb to at least 1500 ft/min & +1 & +1500 \\
+		SDES2500 & Strengthen descent to  at least 2500 ft/min & -1 & -2500 \\
+		SCL2500 & Strengthen climb to at least 2500 ft/min & +1 & +2500 \\
+		MTLO & Multi-threat level-off & N/A & N/A \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+
+
+\section{In terms of $\tau$}
+The reduced dimensionality network uses a $\tau$ variable rather than $r$ and $r_v$, where 
+\begin{equation}
+	\tau=\frac{r-r_p}{r_v}
+\end{equation} 
+Bounds 0 and 2 can be ignored since the network only considers states where $\tau>6$ seconds. 
+Assuming $v_\text{I}=0$ and $a_{\text{lo}}=\infty$, the equations reduce to
+
+\begin{align}
+	\text{bound}_\text{4}(r,h,w,v_\text{lo}) &\equiv wr_vh<wv_\text{lo}(r-r_p)- \frac{r_vv_\text{lo}^2}{2a_\text{lo}} - r_vh_p \\
+	 &\equiv wr_vh<wv_\text{lo}(r-r_p) - r_vh_p \\
+	 &\equiv wh<wv_\text{lo}\tau - h_p \\
+\end{align}
+
+\section{Marabou bounds}
+The safe region can be defined as 
+
+\begin{equation}
+\Omega_\text{safe}(h,\tau,w,v_\text{lo}) \equiv wh<wv_\text{lo}\tau-h_p
+\end{equation}
+
+Marabou will search the region outside the safe region to see if an advisory is ever issued outside of its safe region. If a satisfying point is found, then an unsafe advisory is found. Otherwise Marabou returns UNSAT, and we know that the advisory is only given in its safe region.
+
+We can define the unsafe region we need to check as:
+
+\begin{align} \label{eq_unsafe}
+\Omega_\text{unsafe}(h,\tau,w,v_\text{lo}) &\equiv \neg \Omega_\text{safe}(h,\tau,w,v_\text{lo}) \\
+&\equiv wh \ge wv_\text{lo}\tau-h_p
+\end{align}
+ 
+\Cref{eq_unsafe} imposes a linear bound involving two of the state variables, $h$ and $\tau$. We also have additional bounds on the state variables:
+
+\begin{equation}
+\SI{-8000}{ft}\le h \le \SI{8000}{ft}
+\end{equation}
+
+\begin{equation}
+wv_\text{lo} \le wv
+\end{equation}
+
+\begin{equation}
+v_\text{I} = \SI{0}{ft\per\second}
+\end{equation}
+
+\begin{equation}
+\SI{6}{\second}\le \tau \le \SI{40}{\second}
+\end{equation}
+
+However, the networks were trained with normalized inputs rather than the original state variables variables. The normalization ensures that the training data is zero mean and unit range for each input, which helps the network to train more quickly. The relationship between the variables $X$ and their normalized values $\bar{X}$ takes the form
+\begin{align}
+	\bar{X} &= (X-\mu_X)/R_X \\
+	X &= R_X\bar{X} + \mu_X
+\end{align}
+where $\mu_X$ is the mean value of $X$ and $R_X$ is the range of values for $X$. These normalization values are
+
+\begin{table}[h!]
+	\caption{Neural network normalization constants}
+	\centering
+	\begin{tabular}{lcc}
+		\toprule
+		Variable & $\mu$ & $R$ \\
+		\midrule
+		$h$ & $\SI{0}{ft}$ & $\SI{16000}{ft}$  \\
+		$v$ & $\SI{0}{ft\per\second}$ & $\SI{200}{ft\per\second}$  \\
+		$v_I$ & $\SI{0}{ft\per\second}$ & $\SI{200}{ft\per\second}$  \\
+		$\tau$ & $\SI{23.8421}{\second}$ & $\SI{34}{\second}$  \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Substituting in the above variable bound equations yields neural network input bounds
+
+\begin{align}
+	-0.5 &\le \bar{h} \le 0.5 \\
+	\frac{wv_{lo}}{R_v} &\le w\bar{v} \\
+	\bar{v}_I &= 0.0 \\
+	\frac{\SI{6}{\second}-\mu_\tau}{R_\tau} &\le \bar{\tau} \le \frac{\SI{40}{\second}-\mu_\tau}{R_\tau} \\
+	-wR_h\bar{h} + v_{lo}wR_\tau\bar{\tau} &\le h_p - v_{lo} w \mu_\tau \label{eq:normHyper}
+\end{align}
+Note that these equations have been simplified slightly by removing $\mu_h$ and $\mu_v$ since their values are $0$. \Cref{eq:normHyper} defines a hyperplane bound of the form $a^Tx <= b$ with 
+\begin{align*}
+	x&=[\bar{h}, \bar{\tau}] \\
+	a&=[-wR_h, v_{lo}wR_\tau] \\
+	b&= h_p - v_{lo} w \mu_\tau 
+\end{align*}
+
+If $v_{lo}=0$, then \cref{eq:normHyper} simplifies to
+\begin{equation}
+	-wR_h\bar{h} \le h_p
+\end{equation}
+
+For each advisory, we can impose these constraints and search for points where the network would issue the advisory. If no points are found, then we are guarantee that the network is safe under the assumptions made (no pilot delay, instantaneous advisory compliance, intruder maintains steady level flight).
+	
+\end{document}
