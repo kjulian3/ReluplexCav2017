@@ -4,17 +4,19 @@
 #include <vector>
 #include <set>
 #include <string>
-//#include <utility>
+#include <utility>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include "Reluplex.h"
+#include "glpk.h"
 #include "IReluplex.h"
-//#include "String.h"
-//#include "File.h"
+#include "String.h"
+#include "File.h"
 #include <cstdio>
-//#include <signal.h>
+#include <signal.h>
+#include "Set.h"
 
 
 namespace py = pybind11;
@@ -55,16 +57,35 @@ void restoreOutputStream(int outputStream)
     }
     close(outputStream);
 }
+Reluplex *lastReluplex = NULL;
+void got_signal( int )
+{
+    if ( lastReluplex )
+    {
+        lastReluplex->quit();
+    }
+}
 
-std::map<int, double> solve(Reluplex &reluplex, std::string redirect=""){
-    // Arguments: InputQuery object, filename to redirect output
-    // Returns: map from variable number to value
+std::pair<Reluplex::FinalStatus, std::map<int, double>> solve(Reluplex &reluplex, std::string redirect=""){
+    // Arguments: Reluplex object, filename to redirect output
+    // Returns: final status result, map from variable number to value
     std::map<int, double> ret;
+    Reluplex::FinalStatus result = Reluplex::NOT_DONE;
+    
+    // Redirect file output if file given
     int output=-1;
     if(redirect.length()>0) 
     {
         output=redirectOutputToFile(redirect);
     }
+    
+    // Signal handling to allow graceful Ctrl+c
+    lastReluplex = &reluplex;
+    struct sigaction sa;
+    memset( &sa, 0, sizeof(sa) );
+    sa.sa_handler = got_signal;
+    sigfillset( &sa.sa_mask );
+    sigaction( SIGINT, &sa, NULL );
     
     // Reluplex settings before solving
     reluplex.setLogging( false );
@@ -78,7 +99,8 @@ std::map<int, double> solve(Reluplex &reluplex, std::string redirect=""){
     // Try to solve
     try{
         reluplex.initialize();
-        Reluplex::FinalStatus result = reluplex.solve();
+        result = reluplex.solve();
+        
         if ( result == Reluplex::SAT )
         {
             printf( "Solution found!\n\n" );
@@ -114,15 +136,19 @@ std::map<int, double> solve(Reluplex &reluplex, std::string redirect=""){
     
     if(output != -1)
         restoreOutputStream(output);
-    return ret;
+    
+    // Reset pointer used for quitting gracefully
+    lastReluplex = NULL;
+    return std::make_pair(result, ret);
 }
 
 PYBIND11_MODULE(ReluplexCore, m) {
     m.doc() = "Reluplex API Library"; 
     m.def("solve", &solve, "Takes in reluplex object and returns the solution");  
+    m.def("got_signal", &got_signal, "Handle Ctrl+C event");
     py::class_<IReluplex>(m, "IReluplex");
-    py::class_<Reluplex, IReluplex>(m, "Reluplex")
-        .def(py::init<unsigned>())
+    py::class_<Reluplex, IReluplex> reluplex(m, "Reluplex");
+    reluplex.def(py::init<unsigned>())
         .def("setUpperBound", &Reluplex::setUpperBound)
         .def("setLowerBound", &Reluplex::setLowerBound)
         .def("getUpperBound", &Reluplex::getUpperBound)
@@ -131,4 +157,10 @@ PYBIND11_MODULE(ReluplexCore, m) {
         .def("initializeCell", &Reluplex::initializeCell)
         .def("setReluPair", &Reluplex::setReluPair)
         .def("markBasic", &Reluplex::markBasic);
+    py::enum_<Reluplex::FinalStatus>(reluplex, "FinalStatus")
+        .value("SAT", Reluplex::FinalStatus::SAT)
+        .value("UNSAT", Reluplex::FinalStatus::UNSAT)
+        .value("ERROR", Reluplex::FinalStatus::ERROR)
+        .value("NOT_DONE", Reluplex::FinalStatus::NOT_DONE)
+        .export_values();
 }

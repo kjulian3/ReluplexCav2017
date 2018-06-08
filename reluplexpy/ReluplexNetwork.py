@@ -106,35 +106,23 @@ class ReluplexNetwork:
         constantVar = self.numVars
         reluplex = ReluplexCore.Reluplex(self.numVars+1)
         
-        #print("Initialize Cells")
         for e in self.equList:
             for (c, v) in e.addendList:
                 assert v < self.numVars
-                #print(e.auxVar,v,c)
                 reluplex.initializeCell(e.auxVar,v,c)
             reluplex.markBasic(e.auxVar)
-            reluplex.initializeCell(e.auxVar,constantVar,e.scalar)
-            #print(e.auxVar,constantVar,e.scalar)
-        
-        #print("Relus:")
+            if e.scalar != 0.0:
+                reluplex.initializeCell(e.auxVar,constantVar,e.scalar)
         for r in self.reluList:
             assert r[1] < self.numVars and r[0] < self.numVars
             reluplex.setReluPair(r[0], r[1]);
-            #reluplex.setLowerBound(r[1], 0.0);
-            #print(r[0],r[1])
-
-        #print("Lower Bounds")
         for l in self.lowerBounds:
             assert l < self.numVars
             reluplex.setLowerBound(l, self.lowerBounds[l])
-            #print(l,self.lowerBounds[l])
-            
-        #print("Upper Bounds")
 
         for u in self.upperBounds:
             assert u < self.numVars
             reluplex.setUpperBound(u, self.upperBounds[u])
-            #print(u,self.upperBounds[u])
         
         reluplex.setLowerBound( constantVar, 1.0 );
         reluplex.setUpperBound( constantVar, 1.0 );
@@ -154,20 +142,26 @@ class ReluplexNetwork:
                     to how an input query was solved.
         """
         reluplex = self.getReluplex()
-        vals = ReluplexCore.solve(reluplex, filename)
-        #vals = {}
+        status, vals = ReluplexCore.solve(reluplex, filename)
+        result="UNKNOWN RESULT"
+        if status==ReluplexCore.Reluplex.UNSAT:
+            result = "UNSAT"
+        elif status==ReluplexCore.Reluplex.SAT:
+            result = "SAT"
+        elif status==ReluplexCore.Reluplex.ERROR:
+            result = "ERROR"
+        elif status==ReluplexCore.Reluplex.NOT_DONE:
+            result = "EARLY TERMINATION"
+            
         if verbose:
-            if len(vals)==0:
-                print("UNSAT")
-            else:
-                print("SAT")
+            print(result)
+            if result=="SAT":
                 for i in range(self.inputVars.size):
                     print("input {} = {}".format(i, vals[self.inputVars.item(i)]))
 
                 for i in range(self.outputVars.size):
                     print("output {} = {}".format(i, vals[self.outputVars.item(i)]))
-
-        return vals
+        return result, vals
 
     def evaluateWithReluplex(self, inputValues, filename="evaluateWithReluplex.log"):
         """

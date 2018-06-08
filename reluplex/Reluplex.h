@@ -270,7 +270,7 @@ public:
             {
                 _finalStatus = Reluplex::ERROR;
                 end = Time::sampleMicro();
-                _totalProgressTimeMilli += Time::timePassed( start, end );
+                _totalProgressTimeMilli = Time::timePassed( start, end );
                 return _finalStatus;
             }
 
@@ -291,9 +291,11 @@ public:
                     printStatistics();
                     _finalStatus = Reluplex::SAT;
                     end = Time::sampleMicro();
-                    _totalProgressTimeMilli += Time::timePassed( start, end );
+                    _totalProgressTimeMilli = Time::timePassed( start, end );
                     return _finalStatus;
                 }
+                end = Time::sampleMicro();
+                _totalProgressTimeMilli = Time::timePassed( start, end );
 
                 unsigned violatingLevelInStack;
                 if ( !progress( violatingLevelInStack ) )
@@ -310,7 +312,7 @@ public:
         catch ( const Error &e )
         {
             end = Time::sampleMicro();
-            _totalProgressTimeMilli += Time::timePassed( start, end );
+            _totalProgressTimeMilli = Time::timePassed( start, end );
 
             if ( e.code() == Error::STACK_IS_EMPTY )
             {
@@ -328,14 +330,14 @@ public:
         catch ( const InvariantViolationError &e )
         {
             end = Time::sampleMicro();
-            _totalProgressTimeMilli += Time::timePassed( start, end );
+            _totalProgressTimeMilli = Time::timePassed( start, end );
             _finalStatus = Reluplex::UNSAT;
             return _finalStatus;
         }
         catch ( ... )
         {
             end = Time::sampleMicro();
-            _totalProgressTimeMilli += Time::timePassed( start, end );
+            _totalProgressTimeMilli = Time::timePassed( start, end );
             _finalStatus = Reluplex::ERROR;
             return _finalStatus;
         }
@@ -343,7 +345,7 @@ public:
         // Quit was called
         _finalStatus = Reluplex::NOT_DONE;
         end = Time::sampleMicro();
-        _totalProgressTimeMilli += Time::timePassed( start, end );
+        _totalProgressTimeMilli = Time::timePassed( start, end );
         return _finalStatus;
     }
 
@@ -1652,14 +1654,14 @@ public:
 
     bool updateLowerBound( unsigned variable, double bound, unsigned level )
     {
-        unsigned partner = 0, b = 0, f = 0;
+        unsigned partner = 0, f = 0; //  b = 0
 
         if ( _reluPairs.isRelu( variable ) )
         {
             // The variable is relu.
             partner = _reluPairs.toPartner( variable );
             f = _reluPairs.isF( variable ) ? variable : partner;
-            b = _reluPairs.isB( variable ) ? variable : partner;
+            // b = _reluPairs.isB( variable ) ? variable : partner;
         }
 
         if ( !_reluPairs.isRelu( variable ) || _dissolvedReluVariables.exists( f ) )
