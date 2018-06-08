@@ -84,13 +84,14 @@ def addEquality(network, vars, coeffs, scalar):
     """
     assert len(vars)==len(coeffs)
     e = Equation()
-    for i in range(len(vars)):
-        e.addAddend(coeffs[i], vars[i])
-    e.setScalar(scalar)
     aux = network.getNewVariable()
     network.setLowerBound(aux, 0.0)
     network.setUpperBound(aux, 0.0)
     e.markAuxiliaryVariable(aux)
+    e.addAddend(-1.0, aux)
+    for i in range(len(vars)):
+        e.addAddend(coeffs[i], vars[i])
+    e.setScalar(scalar)
     network.addEquation(e)
 
 def addInequality(network, vars, coeffs, scalar):
@@ -105,11 +106,11 @@ def addInequality(network, vars, coeffs, scalar):
     """
     assert len(vars)==len(coeffs)
     e = Equation()
-    for i in range(len(vars)):
-        e.addAddend(coeffs[i], vars[i])
-    e.setScalar(scalar)
     aux = network.getNewVariable()
     network.setUpperBound(aux, 0.0)
     e.markAuxiliaryVariable(aux)
     e.addAddend(-1.0, aux)
+    for i in range(len(vars)):
+        e.addAddend(coeffs[i], vars[i])
+    e.setScalar(scalar)
     network.addEquation(e)

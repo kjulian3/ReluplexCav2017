@@ -57,8 +57,10 @@ LOCAL_INCLUDES += \
 
 CFLAGS += \
 	-MMD \
-	-std=c++0x \
-    -O3 \
+	-Wall \
+	-Wextra \
+	-Werror \
+	-Wno-deprecated \
 	\
 	-g \
 
