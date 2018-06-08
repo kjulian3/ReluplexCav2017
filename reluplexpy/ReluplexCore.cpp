@@ -56,7 +56,7 @@ void restoreOutputStream(int outputStream)
     close(outputStream);
 }
 
-std::map<int, double> solve(Reluplex reluplex, std::string redirect=""){
+std::map<int, double> solve(Reluplex &reluplex, std::string redirect=""){
     // Arguments: InputQuery object, filename to redirect output
     // Returns: map from variable number to value
     std::map<int, double> ret;
