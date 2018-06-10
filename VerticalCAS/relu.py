@@ -1,5 +1,5 @@
 # Import statements
-# Make sure maraboupy folder is in python path
+# Make sure ReluplexCav2017 (folder containing reluplexpy) is in python path
 import numpy as np
 from reluplexpy import Reluplex
 from reluplexpy import ReluplexUtils
@@ -70,8 +70,8 @@ for pra in range(1,12):
         ra_name = ra_names[advIndex]
         
         # File names
-        fn = "marResults/pra%s_ra%s.txt"%(pra_name,ra_name)
-        marLog = "marLogs/pra%s_ra%s.log"%(pra_name,ra_name)
+        fn = "reluplexResults/pra%s_ra%s.txt"%(pra_name,ra_name)
+        reluLog = "reluplexLogs/pra%s_ra%s.log"%(pra_name,ra_name)
         
         file = open(fn,"w") 
         file.write("Pra: %s, Advisory: %s (w: %d, vlo: %.2f ft/s)\n" % (pra_name,ra_name,w,vlo))
@@ -126,7 +126,7 @@ for pra in range(1,12):
                 ReluplexUtils.addInequality(net1, [outputVars[advIndex], outputVars[i]], [-1, 1],0)
 
         # Solve
-        result, vals = net1.solve(marLog)
+        result, vals = net1.solve(reluLog)
         
         file = open(fn,"a")
         file.write(result + "\n")
