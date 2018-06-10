@@ -25,9 +25,12 @@ Compiling Reluplex:
 Running Experiments:
 
 	  cd VerticalCAS
-	  mkdir marResults
-	  mkdir marLogs
-	  python3 mar.py
+	  mkdir reluResults
+	  mkdir reluLogs
+	  python3 relu.py
+
+    You can also use runReluPra.sh to check networks with different previous RA values in parallel:
+          ./runReluPra.sh 1 2 3 4
 	  
 	  
 
