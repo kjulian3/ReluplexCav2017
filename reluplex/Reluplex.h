@@ -25,7 +25,7 @@
 #include "Tableau.h"
 #include "Stack.h"
 #include "SmtCore.h"
-#include "Stringf.h"
+#include "MStringf.h"
 #include "Time.h"
 #include "VariableBound.h"
 #include <string.h>

@@ -15,7 +15,7 @@
 
 #include "IReluplex.h"
 #include "Stack.h"
-#include "Stringf.h"
+#include "MStringf.h"
 #include "Tableau.h"
 #include "Time.h"
 #include "VariableBound.h"
