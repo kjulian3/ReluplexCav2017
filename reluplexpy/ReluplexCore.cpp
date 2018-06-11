@@ -1,22 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <map>
-#include <vector>
-#include <set>
-#include <string>
-#include <utility>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
 #include "Reluplex.h"
-#include "glpk.h"
-#include "IReluplex.h"
-#include "String.h"
-#include "File.h"
-#include <cstdio>
 #include <signal.h>
-#include "Set.h"
 
 
 namespace py = pybind11;
