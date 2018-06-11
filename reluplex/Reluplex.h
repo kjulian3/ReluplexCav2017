@@ -26,7 +26,7 @@
 #include "Stack.h"
 #include "SmtCore.h"
 #include "MStringf.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "VariableBound.h"
 #include <string.h>
 
