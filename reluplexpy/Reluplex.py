@@ -1,10 +1,10 @@
 #Reluplex File
 from .ReluplexNetworkNNet import *
-#from .ReluplexNetworkTF import *
+from .ReluplexNetworkTF import *
 
 def read_nnet(filename):
     """
-    Constructs a MarabouNetworkNnet object from a .nnet file
+    Constructs a ReluplexNetworkNnet object from a .nnet file
 
     Args:
         filename: (string) path to the .nnet file.
@@ -13,10 +13,9 @@ def read_nnet(filename):
     """
     return ReluplexNetworkNNet(filename)
 
-'''
 def read_tf(filename, inputName=None, outputName=None, savedModel=False, savedModelTags=[]):
     """
-    Constructs a MarabouNetworkTF object from a frozen Tensorflow protobuf
+    Constructs a ReluplexNetworkTF object from a frozen Tensorflow protobuf
 
     Args:
         filename: (string) If savedModel is false, path to the frozen graph .pb file.
@@ -27,7 +26,6 @@ def read_tf(filename, inputName=None, outputName=None, savedModel=False, savedMo
         savedModel: (bool) If false, load frozen graph. If true, load SavedModel object.
         savedModelTags: (list of strings) If loading a SavedModel, the user must specify tags used.
     Returns:
-        marabouNetworkTF: (MarabouNetworkTF) representing network
+        marabouNetworkTF: (MReluplexNetworkTF) representing network
     """
-    return MarabouNetworkTF(filename, inputName, outputName, savedModel, savedModelTags)
-'''
+    return ReluplexNetworkTF(filename, inputName, outputName, savedModel, savedModelTags)
