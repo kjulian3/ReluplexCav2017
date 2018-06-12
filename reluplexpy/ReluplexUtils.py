@@ -68,7 +68,7 @@ class Equation:
             if self.addendList[i][1] == x:
                 coeff = self.addendList[i][0]
                 self.addendList[i] = (coeff, xprime)
-                self.setScalar(self.scalar - coeff*c)
+                self.setScalar(self.scalar + coeff*c)
                 self.participatingVariables.remove(x)
                 self.participatingVariables.update([xprime])
 
