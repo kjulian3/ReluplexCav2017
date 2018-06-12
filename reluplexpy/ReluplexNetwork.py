@@ -68,7 +68,7 @@ class ReluplexNetwork:
             v2: (int) variable representing output of Relu
         """
         self.reluList += [(v1, v2)]
-
+        
     def lowerBoundExists(self, x):
         """
         Function to check whether lower bound for a variable is known
@@ -115,7 +115,8 @@ class ReluplexNetwork:
                 reluplex.initializeCell(e.auxVar,constantVar,e.scalar)
         for r in self.reluList:
             assert r[1] < self.numVars and r[0] < self.numVars
-            reluplex.setReluPair(r[0], r[1]);
+            reluplex.setReluPair(r[0], r[1]);  
+            
         for l in self.lowerBounds:
             assert l < self.numVars
             reluplex.setLowerBound(l, self.lowerBounds[l])
@@ -185,7 +186,7 @@ class ReluplexNetwork:
             reluplex.setLowerBound(k, inputDict[k])
             reluplex.setUpperBound(k, inputDict[k])
 
-        outputDict = ReluplexCore.solve(reluplex, filename)
+        status, outputDict = ReluplexCore.solve(reluplex, filename)
         outputValues = outputVars.reshape(-1).astype(np.float64)
         for i in range(len(outputValues)):
             outputValues[i] = outputDict[outputValues[i]]
