@@ -1,9 +1,9 @@
 #!/bin/bash
-# Run mutliple instances of marPra.py in parallel
-# Execute "./runMarPra.sh pra1 pra2 pra3 ..." to run simultaneously 
-#    python3 marPra.py pra1
-#    python3 marPra.py pra2
-#    python3 marPra.py pra3
+# Run mutliple instances of reluPra.py in parallel
+# Execute "./runReluPra.sh pra1 pra2 pra3 ..." to run simultaneously 
+#    python3 reluPra.py pra1
+#    python3 reluPra.py pra2
+#    python3 reluPra.py pra3
 #    etc.
 
 for cmd in "$@"; do {
