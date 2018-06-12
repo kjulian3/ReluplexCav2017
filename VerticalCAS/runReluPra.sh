@@ -7,8 +7,8 @@
 #    etc.
 
 for cmd in "$@"; do {
-  echo "Process \"python3 marPra.py $cmd\" started";
-  python3 marPra.py $cmd & pid=$!
+  echo "Process \"python3 reluPra.py $cmd\" started";
+  python3 reluPra.py $cmd & pid=$!
   PID_LIST+=" $pid";
 } done
 
