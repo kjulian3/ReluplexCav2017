@@ -382,17 +382,32 @@ class ReluplexNetworkTF(ReluplexNetwork.ReluplexNetwork):
                             if di < prevValues.shape[1] and dj < prevValues.shape[2]:
                                 maxVars.append(prevValues[0][di][dj][k])
                     self.maxToRelu(maxVars,curValues[0][i][j][k])
-                    #self.addMaxConstraint(maxVars, curValues[0][i][j][k])
 
     def maxToRelu(self, elements, v):
+        """
+        Function to implement max-pooling using Relus
+        For two inputs, z=max(x,y) can be written as z=Relu(x-y)+y
+        Since the number of elements can be more than 2, we need to chain the equations
+        This implentation uses a tree approach so that Relu-depth is of order log(n)
+        
+        Arguments:
+            elements: List of variables to input to max()
+            v: Variable for the output of max()
+        """
+        ### Iterate until we only have 1 element remaining ###
         while len(elements)>=2:
+            
+            ### Store output variables of intermediate max(x,y) ###
             outVars = []
+            
+            ### Iterate through all elements and define z = max(element1, element2) ###
+            ### Items are removed elements after they are used in max equation ###
             while len(elements)>1:
-                # z = max(elements[0], elements[1])
-                # z = Relu(elements[0]-elements[1]) + elements[1]
-                # This is split into the following three steps
+                ### z = max(elements[0], elements[1]) ###
+                ### z = Relu(elements[0]-elements[1]) + elements[1] ###
+                ### This is split into the following three steps ###
                 
-                # a = x-y
+                ### a = x-y ###
                 a = self.getNewVariable()
                 aux1 = self.getNewVariable()
                 self.setLowerBound(aux1, 0.0)
@@ -405,13 +420,15 @@ class ReluplexNetworkTF(ReluplexNetwork.ReluplexNetwork):
                 e.setScalar(0.0)
                 self.addEquation(e)
                 
-                # b = Relu(a)
+                ### b = Relu(a) ###
                 b = self.getNewVariable()
                 self.setLowerBound(b, 0.0)
                 self.addRelu(a,b)
                 
-                # z = b+y
+                ### z = b+y ###
                 z = 0
+                
+                ### If this is the last max in chain, use the given output variable
                 if len(elements)==2 and len(outVars)==0:
                     z = v
                 else:
@@ -427,15 +444,14 @@ class ReluplexNetworkTF(ReluplexNetwork.ReluplexNetwork):
                 e.setScalar(0.0)
                 self.addEquation(e)
                 
+                ### Store output variable, remove used elements ###
                 outVars.append(z)
                 elements.remove(elements[1])
                 elements.remove(elements[0])
+               
+            ### Reset elements list with any unused elements and the max() outputs ###
             elements = elements + outVars
-        
-             
-                
-                
-        
+
     def makeNeuronEquations(self, op): 
         """
         Function to generate equations corresponding to given operation
