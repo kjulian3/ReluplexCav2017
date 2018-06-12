@@ -41,10 +41,9 @@ class ReluplexNetworkNNet(ReluplexNetwork.ReluplexNetwork):
         equations = self.buildEquations()
         for equation in equations:
             e = Equation()
-            for term in equation[:-1]:
+            for term in equation[1:-1]:
                 e.addAddend(term[1], term[0])
             e.setScalar(equation[-1])
-            # aux variable is third to last to be added
             e.markAuxiliaryVariable(equation[0][0])
             
             self.addEquation(e)
