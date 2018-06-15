@@ -98,7 +98,6 @@ std::pair<Reluplex::FinalStatus, std::map<int, double>> solve(Reluplex &reluplex
     
     // Try to solve
     try{
-        reluplex.initialize();
         result = reluplex.solve();
         
         if ( result == Reluplex::SAT )
