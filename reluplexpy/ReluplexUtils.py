@@ -75,7 +75,7 @@ class Equation:
 def addEquality(network, vars, coeffs, scalar):
     """
     Function to conveniently add equality constraint to network
-    \sum_i vars_i*coeffs_i = scalar
+    \sum_i vars_i*coeffs_i - scalar = 0
     Arguments:
         network: (MarabouNetwork) to which to add constraint
         vars: (list) of variable numbers
@@ -90,13 +90,13 @@ def addEquality(network, vars, coeffs, scalar):
     e.markAuxiliaryVariable(aux)
     for i in range(len(vars)):
         e.addAddend(coeffs[i], vars[i])
-    e.setScalar(scalar)
+    e.setScalar(-scalar)
     network.addEquation(e)
 
 def addInequality(network, vars, coeffs, scalar):
     """
     Function to conveniently add inequality constraint to network
-    \sum_i vars_i*coeffs_i <= scalar
+    \sum_i vars_i*coeffs_i -scalar <= 0
     Arguments:
         network: (MarabouNetwork) to which to add constraint
         vars: (list) of variable numbers
@@ -110,5 +110,5 @@ def addInequality(network, vars, coeffs, scalar):
     e.markAuxiliaryVariable(aux)
     for i in range(len(vars)):
         e.addAddend(coeffs[i], vars[i])
-    e.setScalar(scalar)
+    e.setScalar(-scalar)
     network.addEquation(e)
