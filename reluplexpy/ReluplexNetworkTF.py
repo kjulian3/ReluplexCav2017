@@ -383,6 +383,9 @@ class ReluplexNetworkTF(ReluplexNetwork.ReluplexNetwork):
                                 maxVars.append(prevValues[0][di][dj][k])
                     self.maxToRelu(maxVars,curValues[0][i][j][k])
 
+    def addMaxConstraint(self, elements, v):
+        self.maxToRelu(elements, v)
+
     def maxToRelu(self, elements, v):
         """
         Function to implement max-pooling using Relus
