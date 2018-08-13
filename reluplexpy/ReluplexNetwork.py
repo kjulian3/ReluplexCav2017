@@ -102,20 +102,27 @@ class ReluplexNetwork:
         Function to convert network into Reluplex object
         Returns:
             reluplex: (ReluplexCore.Reluplex) representing query we want to solve with Reluplex
-        """
-        constantVar = self.numVars
-        reluplex = ReluplexCore.Reluplex(self.numVars+1)
+        """ 
+        constantVar = self.numVars 
+        reluplex = ReluplexCore.Reluplex(constantVar+1)
+        for inputVar in self.inputVars.reshape(-1):
+            if inputVar not in self.lowerBounds:
+                reluplex.setLowerBound(inputVar, ReluplexCore.negativeInfinity())
+            if inputVar not in self.upperBounds:
+                reluplex.setUpperBound(inputVar, ReluplexCore.infinity()) 
         
         for e in self.equList:
+            reluplex.initializeCell(e.auxVar,e.auxVar,-1.0)
+            reluplex.markBasic(e.auxVar)
             for (c, v) in e.addendList:
                 assert v < self.numVars
                 reluplex.initializeCell(e.auxVar,v,c)
-            reluplex.markBasic(e.auxVar)
             if e.scalar != 0.0:
                 reluplex.initializeCell(e.auxVar,constantVar,e.scalar)
+                      
         for r in self.reluList:
             assert r[1] < self.numVars and r[0] < self.numVars
-            reluplex.setReluPair(r[0], r[1]);  
+            reluplex.setReluPair(r[0], r[1])
             
         for l in self.lowerBounds:
             assert l < self.numVars

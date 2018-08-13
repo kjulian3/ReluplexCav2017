@@ -1,23 +1,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <map>
-#include <vector>
-#include <set>
-#include <string>
-#include <utility>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
 #include "Reluplex.h"
-#include "glpk.h"
-#include "IReluplex.h"
-#include "String.h"
-#include "File.h"
-#include <cstdio>
 #include <signal.h>
-#include "Set.h"
-
+#include <cfloat>
 
 namespace py = pybind11;
 
@@ -141,10 +126,22 @@ std::pair<Reluplex::FinalStatus, std::map<int, double>> solve(Reluplex &reluplex
     return std::make_pair(result, ret);
 }
 
+float infinity()
+{
+    return FLT_MAX;
+}
+
+float negativeInfinity()
+{
+    return FLT_MIN;
+}
+
 PYBIND11_MODULE(ReluplexCore, m) {
     m.doc() = "Reluplex API Library"; 
     m.def("solve", &solve, "Takes in reluplex object and returns the solution");  
-    m.def("got_signal", &got_signal, "Handle Ctrl+C event");
+    m.def("got_signal", &got_signal, "Handle Ctrl+C event"); 
+    m.def("infinity", &infinity, "cfloat maximum double"); 
+    m.def("negativeInfinity", &negativeInfinity, "cfloat minimum double");
     py::class_<IReluplex>(m, "IReluplex");
     py::class_<Reluplex, IReluplex> reluplex(m, "Reluplex");
     reluplex.def(py::init<unsigned>())
