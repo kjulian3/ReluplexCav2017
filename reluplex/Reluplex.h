@@ -200,8 +200,8 @@ public:
             _preprocessedAssignment[i] = 0.0;
         }
 
-        FloatUtils::printEpsion();
-        printf( "Almost-broken nuking marging: %.15lf\n", ALMOST_BROKEN_RELU_MARGIN );
+        //FloatUtils::printEpsion();
+        //printf( "Almost-broken nuking marging: %.15lf\n", ALMOST_BROKEN_RELU_MARGIN );
     }
 
     ~Reluplex()
