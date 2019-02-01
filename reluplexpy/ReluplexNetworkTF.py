@@ -166,10 +166,9 @@ class ReluplexNetworkTF(ReluplexNetwork.ReluplexNetwork):
         if op.node_def.op == 'Identity':
             return self.getValues(input_ops[0])
         if op.node_def.op in ['Reshape', 'Pack']:
-            prevValues = [tf.constant(self.getValues[i]) for i in input_ops]
-            names = [x.op.name for x in prevValues]
-            op.node_def.inputs = names
-            return self.sess.run(op)
+            prevValues = [self.getValues(i) for i in input_ops]
+            shape = prevValues[1]
+            return np.reshape(prevValues[0], shape)
         if op.node_def.op == 'Const':
             tproto = op.node_def.attr['value'].tensor
             return tensor_util.MakeNdarray(tproto)
@@ -384,7 +383,7 @@ class ReluplexNetworkTF(ReluplexNetwork.ReluplexNetwork):
                     self.maxToRelu(maxVars,curValues[0][i][j][k])
 
     def addMaxConstraint(self, elements, v):
-        self.maxToRelu(elements, v)
+        self.maxToRelu(list(elements), v)
 
     def maxToRelu(self, elements, v):
         """
