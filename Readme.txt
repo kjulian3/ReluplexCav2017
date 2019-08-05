@@ -20,18 +20,7 @@ Compiling Reluplex:
 	  cd reluplexpy
 	  make
     Then add the root ReluplexCav2017 folder to your PYTHONPATH variable. You can add it to ~/.bashrc so the folder is always on the path.
-    
-    
-Running Experiments:
-
-	  cd VerticalCAS
-	  mkdir reluplexResults
-	  mkdir reluplexLogs
-	  python3 relu.py
-
-    You can also use runReluPra.sh to check networks with different previous RA values in parallel:
-          ./runReluPra.sh 1 2 3 4
-	  
+    	  
 	  
 
 *** Reluplex, May 2017 ***
